@@ -6,7 +6,7 @@ use crate::{
     BoltType,
 };
 
-use serde::Deserialize;
+use serde::{de::IntoDeserializer, Deserialize, Deserializer};
 use std::convert::TryInto;
 
 /// Represents a row returned as a result of executing a query.
@@ -71,6 +71,14 @@ impl Path {
 
     pub fn rels(&self) -> Vec<UnboundedRelation> {
         self.relationships_as().unwrap()
+    }
+
+    /// Obtain the instance of [`serde::de::Deserializer`], which
+    /// can be used with deserialization adapters like [`serde_path_to_error::Deserializer`]
+    ///
+    /// [`serde_path_to_error::Deserializer`]: https://docs.rs/serde_path_to_error/latest/serde_path_to_error/struct.Deserializer.html
+    pub fn to_deserializer(&self) -> impl Deserializer<'_, Error = DeError> {
+        self.inner.into_deserializer()
     }
 
     /// Deserialize the path into a custom type that implements [`serde::Deserialize`]
@@ -167,6 +175,14 @@ impl Row {
         self.attributes.get::<T>(key)
     }
 
+    /// Obtain the instance of [`serde::de::Deserializer`], which
+    /// can be used with deserialization adapters like [`serde_path_to_error::Deserializer`]
+    ///
+    /// [`serde_path_to_error::Deserializer`]: https://docs.rs/serde_path_to_error/latest/serde_path_to_error/struct.Deserializer.html
+    pub fn to_deserializer(&self) -> impl Deserializer<'_> {
+        self.attributes.to_deserializer()
+    }
+
     pub fn to<'this, T>(&'this self) -> Result<T, DeError>
     where
         T: Deserialize<'this>,
@@ -222,6 +238,14 @@ impl Node {
         self.inner.properties.get::<T>(key)
     }
 
+    /// Obtain the instance of [`serde::de::Deserializer`], which
+    /// can be used with deserialization adapters like [`serde_path_to_error::Deserializer`]
+    ///
+    /// [`serde_path_to_error::Deserializer`]: https://docs.rs/serde_path_to_error/latest/serde_path_to_error/struct.Deserializer.html
+    pub fn to_deserializer(&self) -> impl Deserializer<'_, Error = DeError> {
+        self.inner.into_deserializer()
+    }
+
     /// Deserialize the node into custom type that implements [`serde::Deserialize`]
     pub fn to<'this, T>(&'this self) -> Result<T, DeError>
     where
@@ -265,6 +289,14 @@ impl Relation {
         self.inner.properties.get::<T>(key)
     }
 
+    /// Obtain the instance of [`serde::de::Deserializer`], which
+    /// can be used with deserialization adapters like [`serde_path_to_error::Deserializer`]
+    ///
+    /// [`serde_path_to_error::Deserializer`]: https://docs.rs/serde_path_to_error/latest/serde_path_to_error/struct.Deserializer.html
+    pub fn to_deserializer(&self) -> impl Deserializer<'_, Error = DeError> {
+        self.inner.into_deserializer()
+    }
+
     /// Deserialize the relationship into custom type that implements [`serde::Deserialize`]
     pub fn to<'this, T>(&'this self) -> Result<T, DeError>
     where
@@ -298,6 +330,14 @@ impl UnboundedRelation {
         T: Deserialize<'this>,
     {
         self.inner.properties.get::<T>(key)
+    }
+
+    /// Obtain the instance of [`serde::de::Deserializer`], which
+    /// can be used with deserialization adapters like [`serde_path_to_error::Deserializer`]
+    ///
+    /// [`serde_path_to_error::Deserializer`]: https://docs.rs/serde_path_to_error/latest/serde_path_to_error/struct.Deserializer.html
+    pub fn to_deserializer(&self) -> impl Deserializer<'_, Error = DeError> {
+        self.inner.into_deserializer()
     }
 
     /// Deserialize the relationship into custom type that implements [`serde::Deserialize`]

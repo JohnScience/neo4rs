@@ -50,11 +50,15 @@ impl BoltType {
 }
 
 impl BoltMap {
+    pub(crate) fn to_deserializer(&self) -> impl Deserializer<'_, Error = DeError> {
+        MapDeserializer::new(self.value.iter())
+    }
+
     pub(crate) fn to<'this, T>(&'this self) -> Result<T, DeError>
     where
         T: Deserialize<'this>,
     {
-        T::deserialize(MapDeserializer::new(self.value.iter()))
+        T::deserialize(self.to_deserializer())
     }
 }
 
